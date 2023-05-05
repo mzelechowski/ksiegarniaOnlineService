@@ -6,6 +6,7 @@ import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
 import pl.malarska.ksiegarnia.catalog.domain.CatalogRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +28,6 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findByTitle(String title) {
-        findAll();
         return repository.findAll()
                 .stream()
                 .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
@@ -43,28 +43,40 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public List<Book> findAll(){
+    public List<Book> findAll() {
         return repository.findAll();
     }
 
-    @Override
-    public Optional<Book> findOneByTitleAndAuthor(String title, String author){
-        return Optional.empty();
-    }
 
     @Override
-    public void addBook(CreateBookCommand command){
+    public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().startsWith(title))
+                .filter(book -> book.getAuthor().startsWith(author))
+                .findFirst();
+    }
+
+
+    @Override
+    public void addBook(CreateBookCommand command) {
         Book book = new Book(command.getTitle(), command.getAuthor(), command.getYear());
         repository.save(book);
     }
 
     @Override
-    public void removeById(Long id){
-
+    public void removeById(Long id) {
+        repository.removeById(id);
     }
 
     @Override
-    public void updateBook(){
-
+    public UpdateBookResponse updateBook(UpdateBookCommand command) {
+        return repository.findById(command.getId())
+                .map(book -> {
+                    command.updateFields(book);
+                    repository.save(book);
+                    return UpdateBookResponse.SUCCESS;
+                }).orElseGet(() -> new UpdateBookResponse(false, Arrays.asList("Book not found with id: " + command.getId())));
     }
+
 }

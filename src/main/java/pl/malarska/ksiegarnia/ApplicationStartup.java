@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
+import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.UpdateBookCommand;
+import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
 
 import java.util.List;
@@ -19,12 +21,14 @@ public class ApplicationStartup implements CommandLineRunner {
                               @Value("${ksiegarnia.catalog.limit:3}") Long limit) {
         this.catalog = catalog;
         this.title = title;
-        this.limit=limit;
+        this.limit = limit;
     }
 
     @Override
     public void run(String... args) {
         initData();
+        findByTitle();
+        findAndUpdate();
         findByTitle();
     }
 
@@ -38,6 +42,21 @@ public class ApplicationStartup implements CommandLineRunner {
 
     private void findByTitle() {
         List<Book> books = catalog.findByTitle(title);
-        books.stream().limit(1).forEach(System.out::println);
+        books.stream().limit(3).forEach(System.out::println);
+    }
+
+    private void findAndUpdate() {
+        System.out.println("Updating book ..........");
+        catalog.findOneByTitleAndAuthor("Wladca", "JRR")
+                .ifPresent(book -> {
+                    UpdateBookCommand command = UpdateBookCommand.builder()
+                            .id(book.getId())
+                            .title("Wladca Pierscieni Druzyna Pierscienia")
+                            .build();
+                    UpdateBookResponse updateBookResponse = catalog.updateBook(command);
+                    System.out.println("Updating book result: " + updateBookResponse.isSuccess());
+                });
+
+
     }
 }
