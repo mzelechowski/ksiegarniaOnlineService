@@ -1,14 +1,20 @@
 package pl.malarska.ksiegarnia.catalog.web;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
 
+import java.math.BigDecimal;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import static pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.*;
 
 
 @RequestMapping("/catalog")
@@ -54,4 +60,34 @@ public class CatalogController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Void> addBook(@RequestBody RestCreateBookCommand command) {
+        Book book = catalog.addBook(command.toCommand());
+        return ResponseEntity.created(createdBookUri(book)).build();
+    }
+
+    private static URI createdBookUri(Book book) {
+        return ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + book.getId().toString()).build().toUri();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id){
+        catalog.removeById(id);
+    }
+
+    @Data
+    private static class RestCreateBookCommand {
+        private Long id;
+        private String title;
+        private String author;
+        private Integer year;
+        private BigDecimal price;
+
+        CreateBookCommand toCommand() {
+            return new CreateBookCommand(title, author, year, price);
+
+        }
+    }
 }
