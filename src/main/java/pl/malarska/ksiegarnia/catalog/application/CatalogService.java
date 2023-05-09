@@ -26,7 +26,6 @@ class CatalogService implements CatalogUseCase {
 //        this.repository=repository;
 //    }
 
-
     @Override
     public Optional<Book> findOneByTitle(String title) {
         return repository.findAll()
@@ -36,10 +35,18 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    public Optional<Book> findOneByAuthor(String author) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getAuthor().toLowerCase().startsWith(author.toLowerCase()))
+                .findFirst();
+    }
+
+    @Override
     public List<Book> findByTitle(String title) {
         return repository.findAll()
                 .stream()
-                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -47,7 +54,7 @@ class CatalogService implements CatalogUseCase {
     public List<Book> findByAuthor(String author) {
         return repository.findAll()
                 .stream()
-                .filter(book -> book.getAuthor().startsWith(author))
+                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -61,11 +68,19 @@ class CatalogService implements CatalogUseCase {
     public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
         return repository.findAll()
                 .stream()
-                .filter(book -> book.getTitle().startsWith(title))
-                .filter(book -> book.getAuthor().startsWith(author))
+                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+                .filter(book -> book.getAuthor().toLowerCase().startsWith(author.toLowerCase()))
                 .findFirst();
     }
 
+    @Override
+    public List<Book> findByTitleAndAuthor(String title, String author) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
+                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public void addBook(CreateBookCommand command) {
@@ -88,4 +103,8 @@ class CatalogService implements CatalogUseCase {
                 }).orElseGet(() -> new UpdateBookResponse(false, Arrays.asList("Book not found with id: " + command.getId())));
     }
 
+    @Override
+    public Optional<Book> findById(Long id) {
+        return repository.findById(id);
+    }
 }
