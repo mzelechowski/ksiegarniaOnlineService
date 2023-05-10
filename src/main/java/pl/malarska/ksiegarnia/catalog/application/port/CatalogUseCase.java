@@ -43,9 +43,7 @@ public interface CatalogUseCase {
         public Book toBook() {
             return new Book(title, author, year, price);
         }
-
     }
-
 
     @Value
     @Builder
@@ -81,5 +79,4 @@ public interface CatalogUseCase {
         boolean success;
         List<String> errors;
     }
-
 }

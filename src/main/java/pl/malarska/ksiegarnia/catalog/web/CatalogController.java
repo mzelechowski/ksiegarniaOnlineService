@@ -2,10 +2,11 @@ package pl.malarska.ksiegarnia.catalog.web;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
@@ -16,8 +17,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.*;
 
@@ -59,6 +60,9 @@ public class CatalogController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
+        if(id.equals(42L)){
+            throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "I am a teapot. Sorry");
+        }
         return catalog
                 .findById(id)
                 .map(book -> ResponseEntity.ok(book))
@@ -85,7 +89,7 @@ public class CatalogController {
     @Data
     private static class RestCreateBookCommand {
 
-        @NotBlank
+        @NotBlank(message = "Prosze podaj tytyuł")
         private String title;
         @NotBlank
         private String author;
