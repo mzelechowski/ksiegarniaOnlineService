@@ -1,5 +1,6 @@
 package pl.malarska.ksiegarnia.catalog.application.port;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
@@ -47,6 +48,7 @@ public interface CatalogUseCase {
 
     @Value
     @Builder
+    @AllArgsConstructor
     class UpdateBookCommand {
         Long id;
         String title;
