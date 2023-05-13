@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
@@ -58,7 +60,7 @@ public class CatalogController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
-        if(id.equals(42L)){
+        if (id.equals(42L)) {
             throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "I am a teapot. Sorry");
         }
         return catalog
@@ -94,6 +96,15 @@ public class CatalogController {
         }
     }
 
+
+    @PutMapping("/{id}/cover")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void addBookCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        System.out.println("Got file: " + file.getOriginalFilename());
+        catalog.updateBookCover(new UpdateBookCoverCommand(id, file.getBytes(), file.getContentType(), file.getOriginalFilename()));
+    }
+
+
     @Data
     private static class RestBookCommand {
 
@@ -111,7 +122,7 @@ public class CatalogController {
             return new CreateBookCommand(title, author, year, price);
         }
 
-        UpdateBookCommand toUpdateCommand(Long id){
+        UpdateBookCommand toUpdateCommand(Long id) {
             return new UpdateBookCommand(id, title, author, year, price);
         }
     }
