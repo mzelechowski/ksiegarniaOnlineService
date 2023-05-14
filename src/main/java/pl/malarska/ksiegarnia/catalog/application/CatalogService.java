@@ -5,17 +5,22 @@ import org.springframework.stereotype.Service;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
 import pl.malarska.ksiegarnia.catalog.domain.CatalogRepository;
+import pl.malarska.ksiegarnia.uploads.application.ports.UploadUseCase;
+import pl.malarska.ksiegarnia.uploads.domain.Upload;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static pl.malarska.ksiegarnia.uploads.application.ports.UploadUseCase.*;
+
 @Service
 @AllArgsConstructor
 class CatalogService implements CatalogUseCase {
 
     private final CatalogRepository repository;
+    private final UploadUseCase upload;
 
 //    //dodano adnotację @Primary w repozytorium
 //    public CatalogService(CatalogRepository repository){
@@ -111,11 +116,11 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void updateBookCover(UpdateBookCoverCommand command) {
-        int byteLength = command.getFile().length;
-        System.out.println("Received cover command: " + command.getFileName() + " bytes " + byteLength);
         repository.findById(command.getId())
                 .ifPresent(book -> {
-//            book.setCoverId();
+                    Upload saveUpload = upload.save(new SaveUploadCommand(command.getFileName(), command.getFile(), command.getContentType()));
+                    book.setCoverId(saveUpload.getId());
+                    repository.save(book);
                 });
     }
 

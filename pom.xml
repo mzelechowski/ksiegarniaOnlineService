@@ -18,6 +18,7 @@
         <java.version>11</java.version>
         <lombok.version>1.18.26</lombok.version>
         <hiberanete.validator.verion>6.2.5.Final</hiberanete.validator.verion>
+        <commons.lang.version>3.12.0</commons.lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -58,6 +59,11 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hiberanete.validator.verion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang.version}</version>
         </dependency>
     </dependencies>
 
