@@ -67,6 +67,27 @@ public class ApplicationStartup implements CommandLineRunner {
         PlaceOrderResponse response = placeOrder.placeOrder(command);
         System.out.println("Created ORDER with id: " + response.getOrderId());
 
+        Book java = catalog.findOneByTitle("Java").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+        Book php = catalog.findOneByTitle("PHP").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+
+        Recipient recipientDeveloper = Recipient
+                .builder()
+                .name("Maciej Zelechowski")
+                .phone("609580000")
+                .street("Warszawska 32")
+                .city("Łomianki")
+                .zipCode("05-092")
+                .email("mike@gmail.com")
+                .build();
+        command = PlaceOrderCommand
+                .builder()
+                .recipient(recipientDeveloper)
+                .item(new OrderItem(java, 5))
+                .item(new OrderItem(php, 7))
+                .build();
+        response = placeOrder.placeOrder(command);
+        System.out.println("Created ORDER with id: " + response.getOrderId());
+
         queryOrder.findAll()
                 .forEach(order -> {
                     System.out.println("GOT ORDER WITH TOTAL PRICE: " + order.totalPrice() + " DETAILS: " + order);
@@ -86,6 +107,8 @@ public class ApplicationStartup implements CommandLineRunner {
         catalog.addBook(new CatalogUseCase.CreateBookCommand("Mężczyźni którzy nieniawidzą kobiet", "Stieg Larsson", 2005, new BigDecimal("15.50")));
         catalog.addBook(new CatalogUseCase.CreateBookCommand("Sezon Burz", "Andrzej Sapkowski", 2013, new BigDecimal("15.50")));
         catalog.addBook(new CatalogUseCase.CreateBookCommand("Wladca Pierścieni, Dwie wieże", "JRR Tolkien", 1956, new BigDecimal("15.50")));
+        catalog.addBook(new CatalogUseCase.CreateBookCommand("Java leksykon", "Marcin Lis", 2007, new BigDecimal("17.50")));
+        catalog.addBook(new CatalogUseCase.CreateBookCommand("PHP5", "Steve Nowicki", 2005, new BigDecimal("79.00")));
     }
 
     private void findByTitle() {
