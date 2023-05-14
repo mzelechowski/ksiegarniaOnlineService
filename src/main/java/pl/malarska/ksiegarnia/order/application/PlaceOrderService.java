@@ -21,4 +21,23 @@ public class PlaceOrderService implements PlaceOrderUseCase {
         Order save = repository.save(order);
         return PlaceOrderResponse.success(save.getId());
     }
+
+    @Override
+    public PlaceOrderResponse updateStatusOrder(UpdateStatusOrderCommand command) {
+        Order order = Order
+                .builder()
+                .id(command.getId())
+                .status(command.getStatus())
+                .recipient(command.getRecipient())
+                .items(command.getItems())
+                .createdAt(command.getCreatedAt())
+                .build();
+        Order save = repository.save(order);
+        return PlaceOrderResponse.success(save.getId());
+    }
+
+    @Override
+    public void deleteOrderById(Long id) {
+        repository.deleteById(id);
+    }
 }
