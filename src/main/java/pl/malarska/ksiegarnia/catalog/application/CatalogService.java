@@ -11,6 +11,7 @@ import pl.malarska.ksiegarnia.uploads.domain.Upload;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static pl.malarska.ksiegarnia.uploads.application.ports.UploadUseCase.*;
@@ -122,6 +123,17 @@ class CatalogService implements CatalogUseCase {
                     book.setCoverId(saveUpload.getId());
                     repository.save(book);
                 });
+    }
+
+    @Override
+    public void removeBookCover(Long id) {
+        repository.findById(id).ifPresent(book -> {
+            if (book.getCoverId() != null) {
+                upload.removeById(book.getCoverId());
+                book.setCoverId(null);
+                repository.save(book);
+            }
+        });
     }
 
 }
