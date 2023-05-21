@@ -6,14 +6,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 @ToString
 @Getter
 @Setter
+@Entity
 public class Book {
-
+    @Id
     private Long id;
     private String title;
     private String author;
@@ -27,5 +30,13 @@ public class Book {
         this.author = author;
         this.year = year;
         this.price = price;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

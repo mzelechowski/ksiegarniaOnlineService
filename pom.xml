@@ -20,9 +20,19 @@
         <hiberanete.validator.verion>6.2.5.Final</hiberanete.validator.verion>
         <commons.lang.version>3.12.0</commons.lang.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <postgres.version>42.5.4</postgres.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgres.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
