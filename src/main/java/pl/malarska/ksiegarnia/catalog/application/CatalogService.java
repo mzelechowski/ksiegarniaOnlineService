@@ -3,8 +3,8 @@ package pl.malarska.ksiegarnia.catalog.application;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
+import pl.malarska.ksiegarnia.catalog.db.BookJpaRepository;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
-import pl.malarska.ksiegarnia.catalog.domain.CatalogRepository;
 import pl.malarska.ksiegarnia.uploads.application.ports.UploadUseCase;
 import pl.malarska.ksiegarnia.uploads.domain.Upload;
 
@@ -19,7 +19,8 @@ import static pl.malarska.ksiegarnia.uploads.application.ports.UploadUseCase.*;
 @AllArgsConstructor
 class CatalogService implements CatalogUseCase {
 
-    private final CatalogRepository repository;
+//    private final CatalogRepository repository;
+    private final BookJpaRepository repository;
     private final UploadUseCase upload;
 
 //    //dodano adnotację @Primary w repozytorium
@@ -96,7 +97,8 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void removeById(Long id) {
-        repository.removeById(id);
+//        repository.removeById(id);
+        repository.deleteById(id);
     }
 
     @Override

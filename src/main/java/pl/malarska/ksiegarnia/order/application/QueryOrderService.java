@@ -2,7 +2,6 @@ package pl.malarska.ksiegarnia.order.application;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.malarska.ksiegarnia.catalog.domain.Book;
 import pl.malarska.ksiegarnia.order.application.port.QueryOrderUseCase;
 import pl.malarska.ksiegarnia.order.domain.Order;
 import pl.malarska.ksiegarnia.order.domain.OrderRepository;

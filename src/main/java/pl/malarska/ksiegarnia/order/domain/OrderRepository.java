@@ -1,6 +1,5 @@
 package pl.malarska.ksiegarnia.order.domain;
 
-import pl.malarska.ksiegarnia.catalog.domain.Book;
 
 import java.util.List;
 import java.util.Optional;
