@@ -2,6 +2,7 @@ package pl.malarska.ksiegarnia.order.web;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +12,11 @@ import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase;
 import pl.malarska.ksiegarnia.order.application.port.QueryOrderUseCase;
 import pl.malarska.ksiegarnia.order.domain.Order;
 import pl.malarska.ksiegarnia.order.domain.OrderStatus;
+
 import java.net.URI;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
 import static pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase.*;
 
@@ -53,13 +56,36 @@ public class OrdersController {
         return ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + response.getOrderId().toString()).build().toUri();
     }
 
-    @PatchMapping("/{id}/{status}")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @PathVariable OrderStatus status)  {
-         Order order =catalog.findById(id).get();
-        UpdateStatusOrderCommand update = new UpdateStatusOrderCommand(order.getId(), status, order.getItems(), order.getRecipient(), order.getCreatedAt());
+//    @PatchMapping("/{id}/{status}")
+//    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @PathVariable OrderStatus status)  {
+//         Order order =catalog.findById(id).get();
+//        UpdateStatusOrderCommand update = new UpdateStatusOrderCommand(order.getId(), status, order.getItems(), order.getRecipient(), order.getCreatedAt());
+//        PlaceOrderResponse response = placeOrderUse.updateStatusOrder(update);
+//        return ResponseEntity.created(createdOrderUri(response)).build();
+//    }
+
+    @PutMapping("/{id}/status")
+    @ResponseStatus(ACCEPTED)
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusCommand command) {
+        Order order = catalog.findById(id).get();
+        System.out.println("Modyfikuje: " + order);   /**   <----- usunać sout */
+        UpdateStatusOrderCommand update = new UpdateStatusOrderCommand(order.getId()
+                , OrderStatus.parseString(command.status).get()
+                , order.getItems()
+                , order.getRecipient()
+                , order.getCreatedAt()
+        );
         PlaceOrderResponse response = placeOrderUse.updateStatusOrder(update);
+        System.out.println("Zmodyfikowany: " + catalog.findById(id).get());  /**   <----- usunać sout */
         return ResponseEntity.created(createdOrderUri(response)).build();
+
     }
+
+    @Data
+    static class UpdateStatusCommand {
+        String status;
+    }
+
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

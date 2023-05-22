@@ -1,1 +1,13 @@
+###
 GET http://localhost:8082/orders
+
+####
+PUT http://localhost:8082/orders/8/status
+Content-Type: application/json
+
+{
+  "status": "CANCELED"
+}
+
+####
+#PUT http://localhost:8082/orders/8/CONFIRMED
