@@ -3,13 +3,13 @@ package pl.malarska.ksiegarnia.order.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase;
+import pl.malarska.ksiegarnia.order.db.OrderJpaRepository;
 import pl.malarska.ksiegarnia.order.domain.Order;
-import pl.malarska.ksiegarnia.order.domain.OrderRepository;
 
 @Service
 @RequiredArgsConstructor
 public class PlaceOrderService implements PlaceOrderUseCase {
-    private final OrderRepository repository;
+    private final OrderJpaRepository repository;
 
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderCommand command) {

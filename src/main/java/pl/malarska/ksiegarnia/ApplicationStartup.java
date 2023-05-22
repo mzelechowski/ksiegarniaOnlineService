@@ -61,8 +61,8 @@ public class ApplicationStartup implements CommandLineRunner {
         PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipientJson)
-                .item(new OrderItem(harry, 16))
-                .item(new OrderItem(sezon, 7))
+                .item(new OrderItem(harry.getId(), 16))
+                .item(new OrderItem(sezon.getId(), 7))
                 .build();
         PlaceOrderResponse response = placeOrder.placeOrder(command);
         System.out.println("Created ORDER with id: " + response.getOrderId());
@@ -82,15 +82,15 @@ public class ApplicationStartup implements CommandLineRunner {
         command = PlaceOrderCommand
                 .builder()
                 .recipient(recipientDeveloper)
-                .item(new OrderItem(java, 5))
-                .item(new OrderItem(php, 7))
+                .item(new OrderItem(java.getId(), 5))
+                .item(new OrderItem(php.getId(), 7))
                 .build();
         response = placeOrder.placeOrder(command);
         System.out.println("Created ORDER with id: " + response.getOrderId());
 
         queryOrder.findAll()
                 .forEach(order -> {
-                    System.out.println("GOT ORDER WITH TOTAL PRICE: " + order.totalPrice() + " DETAILS: " + order);
+                    System.out.println("GOT ORDER WITH TOTAL PRICE: " + 0 + " DETAILS: " + order);
                 });
 
     }
