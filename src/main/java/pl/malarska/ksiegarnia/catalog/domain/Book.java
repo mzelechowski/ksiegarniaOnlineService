@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @ToString
@@ -24,7 +25,9 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
-    private String author;
+    @ManyToMany(fetch=FetchType.EAGER)
+    @JoinTable
+    private Set<Author> authors;
     private Integer year;
     private BigDecimal price;
     private Long coverId;
@@ -34,9 +37,8 @@ public class Book {
     private LocalDateTime updatedAt;
 
 
-    public Book(String title, String author, Integer year, BigDecimal price) {
+    public Book(String title,  Integer year, BigDecimal price) {
         this.title = title;
-        this.author = author;
         this.year = year;
         this.price = price;
     }
