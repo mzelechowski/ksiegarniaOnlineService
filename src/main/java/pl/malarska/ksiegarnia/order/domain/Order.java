@@ -1,6 +1,9 @@
 package pl.malarska.ksiegarnia.order.domain;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 import javax.persistence.*;
@@ -14,10 +17,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
-@Getter
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Builder.Default
@@ -28,13 +31,15 @@ public class Order {
     @JoinColumn(name ="order_id")
     private List<OrderItem> items;
     private transient Recipient recipient;
+    @CreatedDate
     private LocalDateTime createdAt;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
 //    public BigDecimal totalPrice() {
 //        return items.stream()
-//                .map(item -> item.getBookId(). .getPrice().multiply(new BigDecimal(item.getQuantity())))
+//                .map(item -> item.getBookId().getPrice()
+//                        .multiply(new BigDecimal(item.getQuantity())))
 //                .reduce(BigDecimal.ZERO, BigDecimal::add);
 //    }
-
-
 }

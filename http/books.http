@@ -1,1 +1,9 @@
 GET http://localhost:8082/catalog
+
+####
+PUT http://localhost:8082//catalog/7
+Content-Type: application/json
+
+{
+  "title": "PHP_2023"
+}
