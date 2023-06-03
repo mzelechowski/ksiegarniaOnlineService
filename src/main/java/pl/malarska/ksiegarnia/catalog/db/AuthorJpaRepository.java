@@ -1,4 +1,4 @@
-package pl.malarska.ksiegarnia.catalog.application.port;
+package pl.malarska.ksiegarnia.catalog.db;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

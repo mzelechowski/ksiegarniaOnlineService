@@ -1,6 +1,7 @@
 package pl.malarska.ksiegarnia.catalog.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,9 +26,12 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+
     @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable
+    @JsonIgnoreProperties("books")
     private Set<Author> authors;
+
     private Integer year;
     private BigDecimal price;
     private Long coverId;

@@ -1,13 +1,10 @@
 package pl.malarska.ksiegarnia;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import pl.malarska.ksiegarnia.catalog.application.port.AuthorJpaRepository;
+import pl.malarska.ksiegarnia.catalog.db.AuthorJpaRepository;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
-import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.UpdateBookCommand;
-import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import pl.malarska.ksiegarnia.catalog.domain.Author;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
 import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase;
@@ -18,7 +15,6 @@ import pl.malarska.ksiegarnia.order.domain.OrderItem;
 import pl.malarska.ksiegarnia.order.domain.Recipient;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 import static pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.*;

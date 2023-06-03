@@ -2,7 +2,7 @@ package pl.malarska.ksiegarnia.catalog.application;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.malarska.ksiegarnia.catalog.application.port.AuthorJpaRepository;
+import pl.malarska.ksiegarnia.catalog.db.AuthorJpaRepository;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
 import pl.malarska.ksiegarnia.catalog.db.BookJpaRepository;
 import pl.malarska.ksiegarnia.catalog.domain.Author;
