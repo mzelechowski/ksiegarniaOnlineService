@@ -115,10 +115,10 @@ public class CatalogController {
     @Data
     private static class RestBookCommand {
 
-        @NotBlank(message = "Prosze podaj tytyuł")
+        @NotBlank(message = "Please provide a title")
         private String title;
-        @NotBlank
-        private String author;
+//        @NotBlank
+//        private String author;
         @NotNull
         private Integer year;
         @NotNull
@@ -126,11 +126,11 @@ public class CatalogController {
         private BigDecimal price;
 
         CreateBookCommand toCreateCommand() {
-            return new CreateBookCommand(title, author, year, price);
+            return new CreateBookCommand(title, Set.of(), year, price);
         }
 
         UpdateBookCommand toUpdateCommand(Long id) {
-            return new UpdateBookCommand(id, title, author, year, price);
+            return new UpdateBookCommand(id, title, Set.of(), year, price);
         }
     }
 }
