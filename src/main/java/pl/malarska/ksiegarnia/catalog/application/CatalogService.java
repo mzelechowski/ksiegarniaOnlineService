@@ -22,9 +22,9 @@ import static pl.malarska.ksiegarnia.uploads.application.ports.UploadUseCase.*;
 @AllArgsConstructor
 class CatalogService implements CatalogUseCase {
 
-//    private final CatalogRepository repository;
+    //    private final CatalogRepository repository;
     private final BookJpaRepository repository;
-    private final AuthorJpaRepository  authorRepository;
+    private final AuthorJpaRepository authorRepository;
     private final UploadUseCase upload;
 
 //    //dodano adnotację @Primary w repozytorium
@@ -98,15 +98,19 @@ class CatalogService implements CatalogUseCase {
         return repository.save(book);
     }
 
-    private Book toBook(CreateBookCommand command){
+    private Book toBook(CreateBookCommand command) {
         Book book = new Book(command.getTitle(), command.getYear(), command.getPrice());
-        Set<Author> authors = command.getAuthors().stream()
+        Set<Author> authors = fetchAuthorsByIds(command.getAuthors());
+        book.setAuthors(authors);
+        return book;
+    }
+
+    private Set<Author> fetchAuthorsByIds(Set<Long> authors) {
+        return authors.stream()
                 .map(authorId -> authorRepository
                         .findById(authorId)
                         .orElseThrow(() -> new IllegalArgumentException("Unable to find author wiht id: " + authorId)))
                 .collect(Collectors.toSet());
-        book.setAuthors(authors);
-        return book;
     }
 
     @Override
@@ -119,11 +123,28 @@ class CatalogService implements CatalogUseCase {
     public UpdateBookResponse updateBook(UpdateBookCommand command) {
         return repository.findById(command.getId())
                 .map(book -> {
-                    command.updateFields(book);
+                    Book updateBook=updateFieds(command, book);
                     repository.save(book);
                     return UpdateBookResponse.SUCCESS;
                 }).orElseGet(() -> new UpdateBookResponse(false, Arrays.asList("Book not found with id: " + command.getId())));
     }
+
+    private Book updateFieds(UpdateBookCommand command, Book book) {
+        if (command.getTitle() != null) {
+            book.setTitle(command.getTitle());
+        }
+        if (command.getAuthors() != null && command.getAuthors().size() > 0) {
+            book.setAuthors(fetchAuthorsByIds(command.getAuthors()));
+        }
+        if (command.getYear() != null) {
+            book.setYear(command.getYear());
+        }
+        if (command.getPrice() != null) {
+            book.setPrice(command.getPrice());
+        }
+        return book;
+    }
+
 
     @Override
     public Optional<Book> findById(Long id) {

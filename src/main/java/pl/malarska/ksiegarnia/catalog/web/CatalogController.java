@@ -15,6 +15,7 @@ import pl.malarska.ksiegarnia.catalog.domain.Book;
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -107,7 +108,7 @@ public class CatalogController {
 
     @DeleteMapping("/{id}/cover")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeBookCover(@PathVariable Long id){
+    public void removeBookCover(@PathVariable Long id) {
         catalog.removeBookCover(id);
     }
 
@@ -117,20 +118,23 @@ public class CatalogController {
 
         @NotBlank(message = "Please provide a title")
         private String title;
-//        @NotBlank
-//        private String author;
+
+        @NotEmpty
+        private Set<Long> authors;
+
         @NotNull
         private Integer year;
+
         @NotNull
         @DecimalMin("0.00")
         private BigDecimal price;
 
         CreateBookCommand toCreateCommand() {
-            return new CreateBookCommand(title, Set.of(), year, price);
+            return new CreateBookCommand(title, authors, year, price);
         }
 
         UpdateBookCommand toUpdateCommand(Long id) {
-            return new UpdateBookCommand(id, title, Set.of(), year, price);
+            return new UpdateBookCommand(id, title, authors, year, price);
         }
     }
 }
