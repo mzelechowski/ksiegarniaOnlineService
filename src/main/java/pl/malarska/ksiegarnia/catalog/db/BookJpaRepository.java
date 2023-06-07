@@ -22,4 +22,13 @@ public interface BookJpaRepository extends JpaRepository<Book, Long> {
                     " OR lower(a.lastName) LIKE lower(concat('%', :name,'%')) "
     )
     List<Book> findByAuthor(@Param("name") String name);
+
+    @Query(
+            " SELECT b FROM Book b JOIN b.authors a " +
+                    " WHERE " +
+                    " lower(b.title) LIKE lower(concat('%', :title1,'%')) " +
+                    "AND ( lower(a.firstName) LIKE lower(concat('%', :name,'%')) " +
+                    " OR lower(a.lastName) LIKE lower(concat('%', :name,'%')) ) "
+    )
+    List<Book> findByTitleAndAuthor(@Param("title1") String title, @Param("name") String name);
 }

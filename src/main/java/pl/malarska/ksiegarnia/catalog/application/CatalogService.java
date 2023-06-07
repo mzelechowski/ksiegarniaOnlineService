@@ -59,13 +59,13 @@ class CatalogService implements CatalogUseCase {
 //                .stream()
 //                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
 //                .collect(Collectors.toList());
-        return  repository.findByTitleStartsWithIgnoreCase(title);
+        return repository.findByTitleStartsWithIgnoreCase(title);
     }
 
     @Override
     public List<Book> findByAuthor(String author) {
 //        return repository.findByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(author,author);
-            return repository.findByAuthor(author);
+        return repository.findByAuthor(author);
 
     }
 
@@ -76,11 +76,16 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findByTitleAndAuthor(String title, String author) {
-        System.out.println("Teraz to");
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
-                .collect(Collectors.toList());
+        return  repository.findByTitleAndAuthor(title, author);
+//        System.out.println("Teraz to: " + title + " " + author);
+//        List<Book> lista = repository.findAll()
+//                .stream()
+//                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
+//                .collect(Collectors.toList());
+//        System.out.println(lista);
+//        lista = lista.stream().filter(book -> book.getAuthors().stream().filter(a -> a.getFirstName().toLowerCase().contains(author.toLowerCase())).isParallel())
+//                .collect(Collectors.toList());
+//        return lista;
     }
 
     @Override
@@ -114,7 +119,7 @@ class CatalogService implements CatalogUseCase {
     public UpdateBookResponse updateBook(UpdateBookCommand command) {
         return repository.findById(command.getId())
                 .map(book -> {
-                    Book updateBook=updateFieds(command, book);
+                    Book updateBook = updateFieds(command, book);
                     repository.save(book);
                     return UpdateBookResponse.SUCCESS;
                 }).orElseGet(() -> new UpdateBookResponse(false, Arrays.asList("Book not found with id: " + command.getId())));
