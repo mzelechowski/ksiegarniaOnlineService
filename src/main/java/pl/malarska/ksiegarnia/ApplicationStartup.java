@@ -7,9 +7,7 @@ import pl.malarska.ksiegarnia.catalog.db.AuthorJpaRepository;
 import pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase;
 import pl.malarska.ksiegarnia.catalog.domain.Author;
 import pl.malarska.ksiegarnia.catalog.domain.Book;
-import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase;
-import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase.PlaceOrderCommand;
-import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase.PlaceOrderResponse;
+import pl.malarska.ksiegarnia.order.application.port.ManipulateOrderUseCase;
 import pl.malarska.ksiegarnia.order.application.port.QueryOrderUseCase;
 import pl.malarska.ksiegarnia.order.domain.OrderItem;
 import pl.malarska.ksiegarnia.order.domain.Recipient;
@@ -18,12 +16,13 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 import static pl.malarska.ksiegarnia.catalog.application.port.CatalogUseCase.*;
+import static pl.malarska.ksiegarnia.order.application.port.ManipulateOrderUseCase.*;
 
 @Component
 @AllArgsConstructor
 public class ApplicationStartup implements CommandLineRunner {
     private final CatalogUseCase catalog;
-    private final PlaceOrderUseCase placeOrder;
+    private final ManipulateOrderUseCase placeOrder;
     private final QueryOrderUseCase queryOrder;
     private final AuthorJpaRepository authorJpaRepository;
 
@@ -34,8 +33,10 @@ public class ApplicationStartup implements CommandLineRunner {
     }
 
     private void placeOrder() {
-        Book effectiveJava = catalog.findOneByTitle("Effective Java").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
-        Book puzzlers = catalog.findOneByTitle("Java Puzzlers").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+        Book effectiveJava = catalog.findOneByTitle("Effective Java")
+                .orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+        Book puzzlers = catalog.findOneByTitle("Java Puzzlers")
+                .orElseThrow(() -> new IllegalStateException("Cannot find a book"));
 
         Recipient recipientJson = Recipient
                 .builder()
@@ -54,7 +55,11 @@ public class ApplicationStartup implements CommandLineRunner {
                 .item(new OrderItem(puzzlers.getId(), 7))
                 .build();
         PlaceOrderResponse response = placeOrder.placeOrder(command);
-        System.out.println("Created ORDER with id: " + response.getOrderId());
+        String result = response.handle(
+                orderId -> "Created ORDER with id: " + orderId,
+                error -> "Failed to created order: " + error
+        );
+        System.out.println(result);
 
 
         Recipient recipientDeveloper = Recipient
@@ -73,12 +78,15 @@ public class ApplicationStartup implements CommandLineRunner {
                 .item(new OrderItem(puzzlers.getId(), 7))
                 .build();
         response = placeOrder.placeOrder(command);
-        System.out.println("Created ORDER with id: " + response.getOrderId());
+        result = response.handle(
+                orderId -> "Created ORDER with id: " + orderId,
+                error -> "Failed to created order: " + error
+        );
+        System.out.println(result);
 
+        // list all orders
         queryOrder.findAll()
-                .forEach(order -> {
-                    System.out.println("GOT ORDER WITH TOTAL PRICE: " + 0 + " DETAILS: " + order);
-                });
+                .forEach(order -> System.out.println("GOT ORDER WITH TOTAL PRICE: " + order.totalPrice() + " DETAILS: " + order));
     }
 
     private void initData() {

@@ -23,7 +23,8 @@ import java.util.Set;
 @ToString(exclude = "authors")
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.AUTO) <- generowało unikatowe klucze względem bazy
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
 

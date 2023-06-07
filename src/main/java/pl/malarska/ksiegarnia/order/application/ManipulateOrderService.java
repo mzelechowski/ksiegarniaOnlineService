@@ -1,14 +1,16 @@
 package pl.malarska.ksiegarnia.order.application;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase;
+import pl.malarska.ksiegarnia.order.application.port.ManipulateOrderUseCase;
 import pl.malarska.ksiegarnia.order.db.OrderJpaRepository;
 import pl.malarska.ksiegarnia.order.domain.Order;
+import pl.malarska.ksiegarnia.order.domain.OrderStatus;
 
 @Service
 @RequiredArgsConstructor
-public class PlaceOrderService implements PlaceOrderUseCase {
+class ManipulateOrderService implements ManipulateOrderUseCase {
     private final OrderJpaRepository repository;
 
     @Override
@@ -23,21 +25,16 @@ public class PlaceOrderService implements PlaceOrderUseCase {
     }
 
     @Override
-    public PlaceOrderResponse updateStatusOrder(UpdateStatusOrderCommand command) {
-        Order order = Order
-                .builder()
-                .id(command.getId())
-                .status(command.getStatus())
-                .recipient(command.getRecipient())
-                .items(command.getItems())
-                .createdAt(command.getCreatedAt())
-                .build();
-        Order save = repository.save(order);
-        return PlaceOrderResponse.success(save.getId());
+    public void deleteOrderById(Long id) {
+        repository.deleteById(id);
     }
 
     @Override
-    public void deleteOrderById(Long id) {
-        repository.deleteById(id);
+    public void updateOrderStatus(Long id, OrderStatus status) {
+        repository.findById(id)
+                .ifPresent(order -> {
+                    order.setStatus(status);
+                    repository.save(order);
+                });
     }
 }

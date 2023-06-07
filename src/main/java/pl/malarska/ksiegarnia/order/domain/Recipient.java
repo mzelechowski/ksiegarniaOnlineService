@@ -4,12 +4,13 @@ import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Recipient {
     @Id
@@ -22,5 +23,12 @@ public class Recipient {
     private String zipCode;
     private String email;
 
-
+    public Recipient(String name, String phone, String street, String city, String zipCode, String email) {
+        this.name = name;
+        this.phone = phone;
+        this.street = street;
+        this.city = city;
+        this.zipCode = zipCode;
+        this.email = email;
+    }
 }

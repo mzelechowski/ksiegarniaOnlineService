@@ -1,95 +1,116 @@
 package pl.malarska.ksiegarnia.order.web;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase;
+import pl.malarska.ksiegarnia.order.application.port.ManipulateOrderUseCase;
 import pl.malarska.ksiegarnia.order.application.port.QueryOrderUseCase;
-import pl.malarska.ksiegarnia.order.domain.Order;
+import pl.malarska.ksiegarnia.order.domain.OrderItem;
 import pl.malarska.ksiegarnia.order.domain.OrderStatus;
+import pl.malarska.ksiegarnia.order.domain.Recipient;
+import pl.malarska.ksiegarnia.web.CreatedURI;
 
 import java.net.URI;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.CREATED;
-import static pl.malarska.ksiegarnia.order.application.port.PlaceOrderUseCase.*;
 
-@RequestMapping("/orders")
+
+import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.*;
+import static pl.malarska.ksiegarnia.order.application.port.ManipulateOrderUseCase.*;
+import static pl.malarska.ksiegarnia.order.application.port.QueryOrderUseCase.*;
+
 @RestController
 @AllArgsConstructor
-public class OrdersController {
-
-    private QueryOrderUseCase catalog;
-    private PlaceOrderUseCase placeOrderUse;
+@RequestMapping("/orders")
+class OrdersController {
+    private final ManipulateOrderUseCase manipulateOrder;
+    private final QueryOrderUseCase queryOrder;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<Order> findAll() {
-        return catalog.findAll();
+    public List<RichOrder> getOrders() {
+        return queryOrder.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        if (id.equals(42L)) {
-            throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "I am a teapot. Sorry");
-        }
-        return catalog
-                .findById(id)
-                .map(order -> ResponseEntity.ok(order))
+    public ResponseEntity<RichOrder> getOrderById(@PathVariable Long id) {
+        return queryOrder.findById(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public ResponseEntity<Void> placeOrder(@RequestBody PlaceOrderCommand command) {
-        PlaceOrderResponse response = placeOrderUse.placeOrder(command);
-        return ResponseEntity.created(createdOrderUri(response)).build();
+    public ResponseEntity<Object> createOrder(@RequestBody CreateOrderCommand command) {
+        return manipulateOrder
+                .placeOrder(command.toPlaceOrderCommand())
+                .handle(
+                        orderId -> ResponseEntity.created(orderUri(orderId)).build(),
+                        error -> ResponseEntity.badRequest().body(error)
+                );
     }
 
-    private static URI createdOrderUri(PlaceOrderResponse response) {
-        return ServletUriComponentsBuilder.fromCurrentRequestUri().path("/" + response.getOrderId().toString()).build().toUri();
+    URI orderUri(Long orderId) {
+        return new CreatedURI("/" + orderId).uri();
     }
-
-//    @PatchMapping("/{id}/{status}")
-//    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @PathVariable OrderStatus status)  {
-//         Order order =catalog.findById(id).get();
-//        UpdateStatusOrderCommand update = new UpdateStatusOrderCommand(order.getId(), status, order.getItems(), order.getRecipient(), order.getCreatedAt());
-//        PlaceOrderResponse response = placeOrderUse.updateStatusOrder(update);
-//        return ResponseEntity.created(createdOrderUri(response)).build();
-//    }
 
     @PutMapping("/{id}/status")
     @ResponseStatus(ACCEPTED)
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusCommand command) {
-        Order order = catalog.findById(id).get();
-        System.out.println("Modyfikuje: " + order);   /**   <----- usunać sout */
-        UpdateStatusOrderCommand update = new UpdateStatusOrderCommand(order.getId()
-                , OrderStatus.parseString(command.status).get()
-                , order.getItems()
-                , order.getRecipient()
-                , order.getCreatedAt()
-        );
-        PlaceOrderResponse response = placeOrderUse.updateStatusOrder(update);
-        System.out.println("Zmodyfikowany: " + catalog.findById(id).get());  /**   <----- usunać sout */
-        return ResponseEntity.created(createdOrderUri(response)).build();
+    public void updateOrderStatus(@PathVariable Long id, @RequestBody UpdateStatusCommand command) {
+        OrderStatus orderStatus = OrderStatus
+                .parseString(command.status)
+                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "Unknown status: " + command.status));
+        manipulateOrder.updateOrderStatus(id, orderStatus);
+    }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void deleteOrder(@PathVariable Long id) {
+        manipulateOrder.deleteOrderById(id);
+    }
+
+    @Data
+    static class CreateOrderCommand {
+        List<OrderItemCommand> items;
+        RecipientCommand recipient;
+
+        PlaceOrderCommand toPlaceOrderCommand() {
+            List<OrderItem> orderItems = items
+                    .stream()
+                    .map(item -> new OrderItem(item.bookId, item.quantity))
+                    .collect(Collectors.toList());
+            return new PlaceOrderCommand(orderItems, recipient.toRecipient());
+        }
+    }
+
+    @Data
+    static class OrderItemCommand {
+        Long bookId;
+        int quantity;
+    }
+
+    @Data
+    static class RecipientCommand {
+        String name;
+        String phone;
+        String street;
+        String city;
+        String zipCode;
+        String email;
+
+        Recipient toRecipient() {
+            return new Recipient(name, phone, street, city, zipCode, email);
+        }
     }
 
     @Data
     static class UpdateStatusCommand {
         String status;
-    }
-
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long id) {
-        placeOrderUse.deleteOrderById(id);
     }
 }
