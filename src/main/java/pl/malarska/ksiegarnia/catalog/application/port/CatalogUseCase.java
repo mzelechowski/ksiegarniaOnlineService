@@ -23,8 +23,6 @@ public interface CatalogUseCase {
 
     List<Book> findAll();
 
-    Optional<Book> findOneByTitleAndAuthor(String title, String author);
-
     List<Book> findByTitleAndAuthor(String title, String author);
 
     Book addBook(CreateBookCommand command);

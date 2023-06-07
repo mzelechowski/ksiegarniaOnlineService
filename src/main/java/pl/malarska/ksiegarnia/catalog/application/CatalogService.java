@@ -38,10 +38,11 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public Optional<Book> findOneByTitle(String title) {
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
-                .findFirst();
+//        return repository.findAll()
+//                .stream()
+//                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+//                .findFirst();
+        return repository.findDistinctFirstByTitleStartsWithIgnoreCase(title);
     }
 
     @Override
@@ -54,18 +55,18 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findByTitle(String title) {
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
-                .collect(Collectors.toList());
+//        return repository.findAll()
+//                .stream()
+//                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
+//                .collect(Collectors.toList());
+        return  repository.findByTitleStartsWithIgnoreCase(title);
     }
 
     @Override
     public List<Book> findByAuthor(String author) {
-        return repository.findAll()
-                .stream()
-//                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
-                .collect(Collectors.toList());
+//        return repository.findByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(author,author);
+            return repository.findByAuthor(author);
+
     }
 
     @Override
@@ -73,22 +74,12 @@ class CatalogService implements CatalogUseCase {
         return repository.findAll();
     }
 
-
-    @Override
-    public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
-//                .filter(book -> book.getAuthor().toLowerCase().startsWith(author.toLowerCase()))
-                .findFirst();
-    }
-
     @Override
     public List<Book> findByTitleAndAuthor(String title, String author) {
+        System.out.println("Teraz to");
         return repository.findAll()
                 .stream()
                 .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
-//                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
